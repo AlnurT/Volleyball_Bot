@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "sample"
+name = "Volleyball_Bot"
 version = "0.1.0"
-description = "Template for future projects"
+description = "My telegram bot for a volleyball group"
 authors = ["AlnurT <alnur.tazhbenov@mail.ru>"]
 
 [tool.poetry.dependencies]
@@ -19,6 +19,8 @@ flake8-mutable = "^1.2.0"
 flake8-print = "^5.0.0"
 flake8-return = "^1.2.0"
 pep8-naming = "^0.13.3"
+aiogram = "^3.3.0"
+environs = "^10.2.0"
 
 [tool.black]
 include = '\.pyi?$'
