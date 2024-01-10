@@ -3,7 +3,7 @@ import logging
 import sys
 
 from src.bot_base import bot, dp
-from src.core.handlers import basic, other
+from src.core.handlers import info
 
 
 async def main() -> None:
@@ -12,8 +12,7 @@ async def main() -> None:
         format="%(asctime)s - [%(levelname)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
         stream=sys.stdout,
     )
-    basic.register_basic_handlers()
-    other.register_other_handlers()
+    info.register_other_handlers()
 
     try:
         await dp.start_polling(bot)
