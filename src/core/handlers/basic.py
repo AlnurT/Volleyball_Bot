@@ -5,7 +5,7 @@ from aiogram.utils.markdown import hbold
 from src.bot_base import dp
 
 
-async def command_start(message: Message) -> None:
+async def command_start(message: Message):
     await message.answer(f"Hello, {hbold(message.from_user.full_name)}!")
 
 
