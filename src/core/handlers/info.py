@@ -26,7 +26,7 @@ async def echo(message: Message) -> None:
         await message.answer("Nice try!")
 
 
-def register_other_handlers():
+def register_info_handlers():
     dp.startup.register(start_bot)
     dp.shutdown.register(stop_bot)
     dp.message.register(send_rules, Command("rules"))
