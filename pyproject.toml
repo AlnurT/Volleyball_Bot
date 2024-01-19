@@ -21,6 +21,7 @@ flake8-return = "^1.2.0"
 pep8-naming = "^0.13.3"
 aiogram = "^3.3.0"
 environs = "^10.2.0"
+asyncpg = "^0.29.0"
 
 [tool.black]
 include = '\.pyi?$'

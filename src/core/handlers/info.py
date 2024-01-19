@@ -3,6 +3,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from src.bot_base import dp
+from src.core.utils.dbconnect import Request
 
 
 async def start_bot(bot: Bot):
@@ -19,7 +20,13 @@ async def send_rules(message: Message, bot: Bot):
         await bot.send_message(chat_id=message.from_user.id, text=rules.read())
 
 
-async def echo(message: Message) -> None:
+async def echo(message: Message, request: Request) -> None:
+    await request.add_data(
+        user_id=message.from_user.id,
+        user_name=message.from_user.first_name,
+        game=True,
+        extra_players=0,
+    )
     try:
         await message.send_copy(chat_id=message.chat.id)
     except TypeError:

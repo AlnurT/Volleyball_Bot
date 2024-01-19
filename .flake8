@@ -11,6 +11,8 @@ ignore =
     D107,
     # Print found
     T201,
+    # Possible SQL injection vector through string-based query construction
+    S608,
 
 
 per-file-ignores =
