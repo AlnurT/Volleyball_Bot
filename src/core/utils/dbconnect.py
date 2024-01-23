@@ -5,6 +5,9 @@ class Request:
     def __init__(self, connector: asyncpg.pool.Pool):
         self.connector = connector
 
+    def get_data(self):
+        return self.connector.fetch("SELECT user_name FROM players")
+
     async def add_data(self, user_id, user_name, game, extra_players):
         query = f"""
                 DO

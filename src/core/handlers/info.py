@@ -3,15 +3,13 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from src.bot_base import dp
-from src.core.utils.dbconnect import Request
 
-
-async def start_bot(bot: Bot):
-    await bot.send_message(chat_id=836876955, text="Бот запущен!")
-
-
-async def stop_bot(bot: Bot):
-    await bot.send_message(chat_id=836876955, text="Бот остановлен!")
+# async def start_bot(bot: Bot):
+#     await bot.send_message(chat_id=836876955, text="Бот запущен!")
+#
+#
+# async def stop_bot(bot: Bot):
+#     await bot.send_message(chat_id=836876955, text="Бот остановлен!")
 
 
 async def send_rules(message: Message, bot: Bot):
@@ -20,13 +18,7 @@ async def send_rules(message: Message, bot: Bot):
         await bot.send_message(chat_id=message.from_user.id, text=rules.read())
 
 
-async def echo(message: Message, request: Request) -> None:
-    await request.add_data(
-        user_id=message.from_user.id,
-        user_name=message.from_user.first_name,
-        game=True,
-        extra_players=0,
-    )
+async def echo(message: Message) -> None:
     try:
         await message.send_copy(chat_id=message.chat.id)
     except TypeError:
@@ -34,7 +26,7 @@ async def echo(message: Message, request: Request) -> None:
 
 
 def register_info_handlers():
-    dp.startup.register(start_bot)
-    dp.shutdown.register(stop_bot)
+    # dp.startup.register(start_bot)
+    # dp.shutdown.register(stop_bot)
     dp.message.register(send_rules, Command("rules"))
     dp.message.register(echo)
