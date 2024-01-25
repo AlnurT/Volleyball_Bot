@@ -2,7 +2,7 @@ import asyncpg
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 
-from src.settings import settings
+from src.config import settings
 
 
 async def create_pool():

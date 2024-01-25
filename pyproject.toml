@@ -20,8 +20,9 @@ flake8-print = "^5.0.0"
 flake8-return = "^1.2.0"
 pep8-naming = "^0.13.3"
 aiogram = "^3.3.0"
-environs = "^10.2.0"
 asyncpg = "^0.29.0"
+sqlalchemy = "^2.0.25"
+environs = "^10.3.0"
 
 [tool.black]
 include = '\.pyi?$'
