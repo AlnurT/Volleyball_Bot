@@ -4,9 +4,9 @@ import sys
 
 from aiogram.methods import DeleteWebhook
 
-from src.bot_base import bot, create_pool, dp
+from src.bot_base import bot, dp
+from src.core.database.orm import AsyncOrm
 from src.core.handlers import basic, info
-from src.core.middlewares.dbmiddlewares import DbSession
 
 
 async def main() -> None:
@@ -15,8 +15,9 @@ async def main() -> None:
         format="%(asctime)s - [%(levelname)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
         stream=sys.stdout,
     )
-    pool_connect = await create_pool()
-    dp.update.middleware.register(DbSession(pool_connect))
+    await AsyncOrm.create_tables()
+    await AsyncOrm.insert_players(123456789, "Alnur", True, 5)
+
     basic.register_basic_handlers()
     info.register_info_handlers()
 
