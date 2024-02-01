@@ -1,13 +1,23 @@
+from sqlalchemy import select
+
 from src.core.database.db_base import Base, async_engine, async_session_factory
 from src.core.database.models import PlayersOrm
 
 
 class AsyncOrm:
+    players_list: list = []
+
     @staticmethod
     async def create_tables():
         async with async_engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
+
+    async def update_players_list(self):
+        async with async_session_factory() as session:
+            query = select(PlayersOrm)
+            cor_object = await session.execute(query)
+            self.players_list = cor_object.scalars().all()
 
     @staticmethod
     async def insert_players(

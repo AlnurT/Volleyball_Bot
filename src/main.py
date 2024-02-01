@@ -15,8 +15,13 @@ async def main() -> None:
         format="%(asctime)s - [%(levelname)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
         stream=sys.stdout,
     )
-    await AsyncOrm.create_tables()
-    await AsyncOrm.insert_players(123456789, "Alnur", True, 5)
+    class_async = AsyncOrm()
+    await class_async.create_tables()
+    await class_async.insert_players(123456789, "Alnur", True, 5)
+    await class_async.insert_players(567891234, "Talga", True, 2)
+    await class_async.update_players_list()
+    print([x.user_name for x in class_async.players_list])
+    print(class_async.players_list)
 
     basic.register_basic_handlers()
     info.register_info_handlers()
