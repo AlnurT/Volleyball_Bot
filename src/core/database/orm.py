@@ -7,12 +7,6 @@ from src.core.database.models import PlayersOrm
 class AsyncOrm:
     players_list: list = []
 
-    @staticmethod
-    async def create_tables():
-        async with async_engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
-            await conn.run_sync(Base.metadata.create_all)
-
     async def update_players_list(self):
         async with async_session_factory() as session:
             query = select(PlayersOrm)
@@ -20,9 +14,25 @@ class AsyncOrm:
             self.players_list = cor_object.scalars().all()
 
     @staticmethod
-    async def insert_players(
-        user_id: int, user_name: str, is_play: bool, extra_pl: int
+    async def create_tables():
+        async with async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
+            await conn.run_sync(Base.metadata.create_all)
+
+    @staticmethod
+    async def update_player_status(
+        user_id: int, is_play: bool | None = None, extra_player: int = 0
     ):
+        async with async_session_factory() as session:
+            player = await session.get(PlayersOrm, user_id)
+            if extra_player:
+                player.extra_pl += extra_player
+            else:
+                player.is_play = is_play
+            await session.commit()
+
+    @staticmethod
+    async def add_player(user_id: int, user_name: str, is_play: bool, extra_pl: int):
         players = PlayersOrm(
             user_id=user_id, user_name=user_name, is_play=is_play, extra_pl=extra_pl
         )
