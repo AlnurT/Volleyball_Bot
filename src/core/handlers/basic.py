@@ -1,26 +1,23 @@
 from aiogram.filters import Command
 from aiogram.types import Message
+from aiogram.utils.formatting import as_list, as_numbered_list
 
 from src.bot_base import dp
 from src.core.keyboards.inline import get_inline_keyboard
-from src.core.utils.dbconnect import Request
 
 
-async def get_pool(message: Message, request: Request):
-    text = "\n".join(x["user_name"] for x in await request.get_data())
+@dp.message(Command("poll"))
+async def get_pool(message: Message):
+    text = as_list(
+        "Игра в четверг\n",
+        "Участники:",
+        as_numbered_list(*["Alnur", "Talga", "Lena"], fmt="{}.    "),
+    )
     await message.answer(
-        f"Привет, {message.from_user.first_name}. Показываю кнопки!\n{text}",
+        **text.as_kwargs(),
         reply_markup=get_inline_keyboard(),
     )
 
 
 def register_basic_handlers():
-    dp.message.register(get_pool, Command("poll"))
-
-
-# await request.add_data(
-#     user_id=message.from_user.id,
-#     user_name=message.from_user.first_name,
-#     game=True,
-#     extra_players=0,
-# )
+    pass
