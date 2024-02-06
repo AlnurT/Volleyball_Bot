@@ -1,17 +1,25 @@
-from sqlalchemy import select
+from sqlalchemy import not_, or_, select
 
 from src.core.database.db_base import Base, async_engine, async_session_factory
 from src.core.database.models import PlayersOrm
 
 
 class AsyncOrm:
-    players_list: list = []
-
-    async def update_players_list(self):
+    @staticmethod
+    async def get_players_list():
         async with async_session_factory() as session:
-            query = select(PlayersOrm)
-            cor_object = await session.execute(query)
-            self.players_list = cor_object.scalars().all()
+            query_play = select(PlayersOrm).filter(
+                or_(PlayersOrm.is_play, PlayersOrm.extra_pl > 0)
+            )
+            result_play = await session.execute(query_play)
+            return result_play.scalars().all()
+
+    @staticmethod
+    async def get_not_players_list():
+        async with async_session_factory() as session:
+            query_not_play = select(PlayersOrm).filter(not_(PlayersOrm.is_play))
+            result_not_play = await session.execute(query_not_play)
+            return result_not_play.scalars().all()
 
     @staticmethod
     async def create_tables():
@@ -21,7 +29,7 @@ class AsyncOrm:
 
     @staticmethod
     async def update_player_status(
-        user_id: int, is_play: bool | None = None, extra_player: int = 0
+        user_id: int, is_play: bool = False, extra_player: int = 0
     ):
         async with async_session_factory() as session:
             player = await session.get(PlayersOrm, user_id)
