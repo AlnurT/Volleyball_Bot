@@ -1,25 +1,17 @@
-from sqlalchemy import not_, or_, select
+from sqlalchemy import select
 
 from src.core.database.db_base import Base, async_engine, async_session_factory
 from src.core.database.models import PlayersOrm
 
 
 class AsyncOrm:
-    @staticmethod
-    async def get_players_list():
-        async with async_session_factory() as session:
-            query_play = select(PlayersOrm).filter(
-                or_(PlayersOrm.is_play, PlayersOrm.extra_pl > 0)
-            )
-            result_play = await session.execute(query_play)
-            return result_play.scalars().all()
+    players_list: list = []
 
-    @staticmethod
-    async def get_not_players_list():
+    async def get_players_list(self):
         async with async_session_factory() as session:
-            query_not_play = select(PlayersOrm).filter(not_(PlayersOrm.is_play))
-            result_not_play = await session.execute(query_not_play)
-            return result_not_play.scalars().all()
+            query = select(PlayersOrm)
+            result = await session.execute(query)
+            self.players_list = result.scalars().all()
 
     @staticmethod
     async def create_tables():
