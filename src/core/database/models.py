@@ -8,5 +8,5 @@ class PlayersOrm(Base):
 
     user_id: Mapped[int] = mapped_column(primary_key=True)
     user_name: Mapped[str]
-    is_play: Mapped[bool] = mapped_column(default=False)
+    is_play: Mapped[bool | None] = mapped_column(default=None)
     extra_player: Mapped[int] = mapped_column(default=0)

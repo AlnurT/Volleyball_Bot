@@ -23,7 +23,7 @@ def send_text(players_list, not_players_list):
     )
 
 
-def create_player_tables(players=None):
+def create_player_tables(players):
     players_list, not_players_list = [], []
 
     for pl in players:
@@ -41,7 +41,7 @@ def create_player_tables(players=None):
 @dp.message(Command("poll"))
 async def get_poll(message: Message):
     await AsyncOrm.create_tables()
-    text_for_poll = send_text([], [])
+    text_for_poll = send_text([""], [""])
     await message.answer(
         **text_for_poll.as_kwargs(),
         reply_markup=get_inline_keyboard(),
@@ -50,29 +50,26 @@ async def get_poll(message: Message):
 
 @dp.callback_query()
 async def play_game(call: CallbackQuery):
+    user_id = call.from_user.id
+    name = call.from_user.full_name
+    is_change = False
+
     match call.data:
         case "is_play_true":
-            await AsyncOrm.update_pl_status(
-                call.from_user.id, call.from_user.first_name, True
-            )
+            is_change = await AsyncOrm.update_pl_status(user_id, name, True)
         case "is_play_false":
-            await AsyncOrm.update_pl_status(
-                call.from_user.id, call.from_user.first_name, False
-            )
+            is_change = await AsyncOrm.update_pl_status(user_id, name, False)
         case "plus_extra_pl":
-            await AsyncOrm.update_pl_status(
-                call.from_user.id, call.from_user.first_name, extra_player=1
-            )
+            is_change = await AsyncOrm.update_pl_status(user_id, name, extra_player=1)
         case "minus_extra_pl":
-            await AsyncOrm.update_pl_status(
-                call.from_user.id, call.from_user.first_name, extra_player=-1
-            )
+            is_change = await AsyncOrm.update_pl_status(user_id, name, extra_player=-1)
 
-    players_list = await AsyncOrm.get_players_list()
-    players_list, not_players_list = create_player_tables(players_list)
-    text_for_poll = send_text(players_list, not_players_list)
-    await call.message.edit_text(**text_for_poll.as_kwargs())
-    await call.message.edit_reply_markup(reply_markup=get_inline_keyboard())
+    if is_change:
+        players_list = await AsyncOrm.get_players_list()
+        players_list, not_players_list = create_player_tables(players_list)
+        text_for_poll = send_text(players_list, not_players_list)
+        await call.message.edit_text(**text_for_poll.as_kwargs())
+        await call.message.edit_reply_markup(reply_markup=get_inline_keyboard())
 
 
 def register_basic_handlers():

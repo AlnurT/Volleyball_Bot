@@ -10,7 +10,8 @@ class AsyncOrm:
         async with async_session_factory() as session:
             query = select(PlayersOrm)
             result = await session.execute(query)
-            return result.scalars().all()
+
+        return result.scalars().all()
 
     @staticmethod
     async def create_tables():
@@ -25,6 +26,9 @@ class AsyncOrm:
         async with async_session_factory() as session:
             player = await session.get(PlayersOrm, user_id)
 
+            # if player is None and extra_player < 0:
+            #     return False
+
             if player is None:
                 player = PlayersOrm(
                     user_id=user_id,
@@ -33,11 +37,22 @@ class AsyncOrm:
                     extra_player=extra_player,
                 )
                 session.add(player)
-            else:
-                if extra_player > 0 or extra_player < 0 < player.extra_player:
-                    player.extra_player += extra_player
+                await session.commit()
+                return True
 
-                if is_play is not None:
-                    player.is_play = is_play
+            if (
+                player.is_play is is_play
+                or player.extra_player == 0
+                and extra_player < 0
+            ):
+                return False
+
+            if extra_player > 0 or extra_player < 0 < player.extra_player:
+                player.extra_player += extra_player
+
+            if is_play is not None:
+                player.is_play = is_play
 
             await session.commit()
+
+        return True
