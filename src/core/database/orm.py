@@ -20,22 +20,25 @@ class AsyncOrm:
             await conn.run_sync(Base.metadata.create_all)
 
     @staticmethod
-    async def update_player_status(
-        user_id: int, is_play: bool = False, extra_player: int = 0
+    async def update_pl_status(
+        user_id: int, user_name: str, is_play: bool = False, extra_player: int = 0
     ):
         async with async_session_factory() as session:
             player = await session.get(PlayersOrm, user_id)
-            if extra_player:
-                player.extra_pl += extra_player
-            else:
-                player.is_play = is_play
-            await session.commit()
 
-    @staticmethod
-    async def add_player(user_id: int, user_name: str, is_play: bool, extra_pl: int):
-        players = PlayersOrm(
-            user_id=user_id, user_name=user_name, is_play=is_play, extra_pl=extra_pl
-        )
-        async with async_session_factory() as session:
-            session.add(players)
+            if player is None:
+                player = PlayersOrm(
+                    user_id=user_id,
+                    user_name=user_name,
+                    is_play=is_play,
+                    extra_pl=extra_player,
+                )
+                session.add(player)
+            else:
+                if extra_player > 0:
+                    player.extra_pl += extra_player
+
+                if is_play != player.is_play:
+                    player.is_play = is_play
+
             await session.commit()
