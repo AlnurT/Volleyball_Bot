@@ -1,5 +1,5 @@
 from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram.types import CallbackQuery, Message
 from aiogram.utils.formatting import as_list, as_numbered_list
 
 from src.bot_base import dp
@@ -38,17 +38,6 @@ def create_player_tables(players=None):
     return players_list, not_players_list
 
 
-async def test_func():
-    # await AsyncOrm.add_player(123456789, "Alnur", False, 5)
-    # await AsyncOrm.add_player(567891234, "Talga", False, 2)
-    # await AsyncOrm.add_player(912345678, "Lena", True, 0)
-    # await AsyncOrm.add_player(912567834, "Kamil", False, 0)
-    # await AsyncOrm.update_player_status(567891234, is_play=True)
-    # await AsyncOrm.update_player_status(123456789, extra_player=1)
-    # await AsyncOrm.update_player_status(567891234, extra_player=-1)
-    pass
-
-
 @dp.message(Command("poll"))
 async def get_poll(message: Message):
     await AsyncOrm.create_tables()
@@ -59,11 +48,31 @@ async def get_poll(message: Message):
     )
 
 
-# @dp.callback_query()
-# async def play_game(call: CallbackQuery):
-#     match call.data:
-#         case "is_play_true":
-#             await call.message.answer("is_play_true")
+@dp.callback_query()
+async def play_game(call: CallbackQuery):
+    match call.data:
+        case "is_play_true":
+            await AsyncOrm.update_pl_status(
+                call.from_user.id, call.from_user.first_name, True
+            )
+        case "is_play_false":
+            await AsyncOrm.update_pl_status(
+                call.from_user.id, call.from_user.first_name, False
+            )
+        case "plus_extra_pl":
+            await AsyncOrm.update_pl_status(
+                call.from_user.id, call.from_user.first_name, extra_player=1
+            )
+        case "minus_extra_pl":
+            await AsyncOrm.update_pl_status(
+                call.from_user.id, call.from_user.first_name, extra_player=-1
+            )
+
+    players_list = await AsyncOrm.get_players_list()
+    players_list, not_players_list = create_player_tables(players_list)
+    text_for_poll = send_text(players_list, not_players_list)
+    await call.message.edit_text(**text_for_poll.as_kwargs())
+    await call.message.edit_reply_markup(reply_markup=get_inline_keyboard())
 
 
 def register_basic_handlers():
