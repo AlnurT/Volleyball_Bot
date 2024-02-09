@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import desc, select
 
 from src.core.database.db_base import Base, async_engine, async_session_factory
 from src.core.database.models import PlayersOrm
@@ -8,10 +8,18 @@ class AsyncOrm:
     @staticmethod
     async def get_players_list():
         async with async_session_factory() as session:
-            query = select(PlayersOrm)
-            result = await session.execute(query)
+            query = select(PlayersOrm.user_name).filter_by(is_play=True)
+            res = await session.execute(query)
+            result = res.scalars().all()
+            return result if result else [""]
 
-        return result.scalars().all()
+    @staticmethod
+    async def get_not_players_list():
+        async with async_session_factory() as session:
+            query = select(PlayersOrm.user_name).filter_by(is_play=False)
+            res = await session.execute(query)
+            result = res.scalars().all()
+            return result if result else [""]
 
     @staticmethod
     async def create_tables():
@@ -20,39 +28,50 @@ class AsyncOrm:
             await conn.run_sync(Base.metadata.create_all)
 
     @staticmethod
-    async def update_pl_status(
-        user_id: int, user_name: str, is_play: bool = None, extra_player: int = 0
-    ):
+    async def update_pl_status(user_id: int, user_name: str, is_play: bool):
         async with async_session_factory() as session:
-            player = await session.get(PlayersOrm, user_id)
+            query = select(PlayersOrm).filter_by(user_id=user_id, user_name=user_name)
+            res = await session.execute(query)
+            result = res.scalars().first()
 
-            # if player is None and extra_player < 0:
-            #     return False
-
-            if player is None:
+            if not result:
                 player = PlayersOrm(
                     user_id=user_id,
                     user_name=user_name,
                     is_play=is_play,
-                    extra_player=extra_player,
                 )
                 session.add(player)
                 await session.commit()
                 return True
 
-            if (
-                player.is_play is is_play
-                or player.extra_player == 0
-                and extra_player < 0
-            ):
+            if result.is_play is is_play:
                 return False
 
-            if extra_player > 0 or extra_player < 0 < player.extra_player:
-                player.extra_player += extra_player
-
-            if is_play is not None:
-                player.is_play = is_play
-
+            result.is_play = is_play
             await session.commit()
+            return True
 
-        return True
+    @staticmethod
+    async def update_extra_pl(user_id: int, user_name: str, extra_pl: int):
+        async with async_session_factory() as session:
+            if extra_pl == 1:
+                player = PlayersOrm(
+                    user_id=user_id, user_name=f"{user_name} +1", is_play=True
+                )
+                session.add(player)
+                await session.commit()
+                return True
+
+            query = (
+                select(PlayersOrm)
+                .filter_by(user_id=user_id, user_name=f"{user_name} +1")
+                .order_by(desc(PlayersOrm.id_num))
+            )
+            res = await session.execute(query)
+            result = res.scalars().first()
+            if result is None:
+                return False
+
+            await session.delete(result)
+            await session.commit()
+            return True
