@@ -1,7 +1,7 @@
 from sqlalchemy import desc, select
 
-from src.core.database.db_base import Base, async_engine, async_session_factory
-from src.core.database.models import PlayersOrm
+from src.database.db_base import Base, async_engine, async_session_factory
+from src.database.models import PlayersOrm
 
 
 class AsyncOrm:

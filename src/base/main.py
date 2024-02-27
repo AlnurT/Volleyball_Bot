@@ -1,11 +1,11 @@
-import asyncio
 import logging
 import sys
 
 from aiogram.methods import DeleteWebhook
 
-from src.bot_base import bot, dp
-from src.core.handlers import basic, info
+from src.base.bot import bot, dp
+from src.handlers import basic
+from src.utils import info
 
 
 async def main() -> None:
@@ -23,7 +23,3 @@ async def main() -> None:
         await dp.start_polling(bot)
     finally:
         await bot.session.close()
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

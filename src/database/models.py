@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.core.database.db_base import Base
+from src.database.db_base import Base
 
 
 class PlayersOrm(Base):

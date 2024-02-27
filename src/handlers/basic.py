@@ -1,24 +1,10 @@
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.formatting import as_list, as_numbered_list
 
-from src.bot_base import dp
-from src.core.database.orm import AsyncOrm
-from src.core.keyboards.inline import get_inline_keyboard
-
-
-async def send_text():
-    players_list = await AsyncOrm.get_players_list()
-    not_players_list = await AsyncOrm.get_not_players_list()
-
-    return as_list(
-        "Игра в четверг\n",
-        "Участники:",
-        as_numbered_list(*players_list, fmt="{}.    "),
-        "",
-        "Не играют:",
-        as_numbered_list(*not_players_list, fmt="{}.    "),
-    )
+from src.base.bot import dp
+from src.database.orm import AsyncOrm
+from src.keyboards.inline import get_inline_keyboard
+from src.utils.poll_message import send_text
 
 
 @dp.message(Command("poll"))
