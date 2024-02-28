@@ -1,3 +1,4 @@
+from aiogram.utils.markdown import hlink
 from sqlalchemy import desc, select
 
 from src.database.db_base import Base, async_engine, async_session_factory
@@ -6,20 +7,14 @@ from src.database.models import PlayersOrm
 
 class AsyncOrm:
     @staticmethod
-    async def get_players_list():
+    async def get_players_list(is_play: bool):
         async with async_session_factory() as session:
-            query = select(PlayersOrm.user_name).filter_by(is_play=True)
+            query = select(PlayersOrm).filter_by(is_play=is_play)
             res = await session.execute(query)
             result = res.scalars().all()
-            return result if result else [""]
-
-    @staticmethod
-    async def get_not_players_list():
-        async with async_session_factory() as session:
-            query = select(PlayersOrm.user_name).filter_by(is_play=False)
-            res = await session.execute(query)
-            result = res.scalars().all()
-            return result if result else [""]
+            if not result:
+                return [""]
+            return [hlink(pl.user_name, f"tg://user?id={pl.user_id}") for pl in result]
 
     @staticmethod
     async def create_tables():

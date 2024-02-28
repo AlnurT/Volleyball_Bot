@@ -1,3 +1,4 @@
+from aiogram.enums import ParseMode
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
 
@@ -11,8 +12,11 @@ from src.utils.poll_message import send_text
 async def get_poll(message: Message):
     await AsyncOrm.create_tables()
     text_for_poll = await send_text()
+    # async with open("src/utils/volleyball.jpg") as photo:
+    #     await message.answer_photo(photo=photo)
+
     await message.answer(
-        **text_for_poll.as_kwargs(),
+        **text_for_poll.as_kwargs(parse_mode_key=ParseMode.HTML),
         reply_markup=get_inline_keyboard(),
     )
 
@@ -35,7 +39,9 @@ async def play_game(call: CallbackQuery):
 
     if is_change:
         text_for_poll = await send_text()
-        await call.message.edit_text(**text_for_poll.as_kwargs())
+        await call.message.edit_text(
+            **text_for_poll.as_kwargs(parse_mode_key=ParseMode.HTML)
+        )
         await call.message.edit_reply_markup(reply_markup=get_inline_keyboard())
 
 
