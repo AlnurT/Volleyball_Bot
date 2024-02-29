@@ -14,7 +14,7 @@ class AsyncOrm:
             result = res.scalars().all()
             if not result:
                 return [""]
-            return [hlink(pl.user_name, f"tg://user?id={pl.user_id}") for pl in result]
+            return (hlink(pl.user_name, f"tg://user?id={pl.user_id}") for pl in result)
 
     @staticmethod
     async def create_tables():
