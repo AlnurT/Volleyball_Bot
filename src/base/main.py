@@ -3,7 +3,7 @@ import sys
 
 from aiogram.methods import DeleteWebhook
 
-from src.base.bot import bot, dp
+from src.base.bot import bot, dp, scheduler
 from src.handlers import basic
 from src.utils import info
 
@@ -14,7 +14,7 @@ async def main() -> None:
         format="%(asctime)s - [%(levelname)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
         stream=sys.stdout,
     )
-
+    scheduler.start()
     basic.register_basic_handlers()
     info.register_info_handlers()
 

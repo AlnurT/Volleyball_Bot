@@ -4,6 +4,7 @@ from environs import Env
 class Settings:
     BOT_TOKEN: str
     BOT_ADMIN_ID: int
+    BOT_CHAT_ID: int
     DB_HOST: str
     DB_PORT: int
     DB_USER: str
@@ -20,6 +21,7 @@ class Settings:
 
         self.BOT_TOKEN = env.str("BOT_TOKEN")
         self.BOT_ADMIN_ID = env.int("ADMIN_ID")
+        self.BOT_CHAT_ID = env.int("CHAT_ID")
         self.DB_USER = env.str("DB_USER")
         self.DB_PASS = env.str("DB_PASS")
         self.DB_NAME = env.str("DB_NAME")
