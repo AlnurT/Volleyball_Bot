@@ -18,5 +18,7 @@ def get_keyboard_tables():
 
     keyboard_builder.button(text="Новый опрос", callback_data="new_poll")
     keyboard_builder.button(text="Старый опрос", callback_data="old_poll")
+    keyboard_builder.button(text="Закрыть опрос", callback_data="end_poll")
+    keyboard_builder.adjust(2, 1)
 
     return keyboard_builder.as_markup()

@@ -24,26 +24,30 @@ async def get_poll_manually(message: Message):
         )
 
 
-async def get_poll(chat_bot: Bot, is_new_data: bool):
+async def get_poll(chat_bot: Bot, is_new_data: bool = True, is_game: bool = True):
     if is_new_data:
         await AsyncOrm.create_tables()
 
-    text_for_poll = await send_text()
+    text_for_poll = await send_text(is_game)
+    keyboard = get_poll_keyboard() if is_game else None
+
     message = await chat_bot.send_photo(
         chat_id=settings.BOT_CHAT_ID,
         photo=FSInputFile("utils/volleyball.jpg"),
         caption=text_for_poll.render()[0],
         parse_mode=ParseMode.HTML,
-        reply_markup=get_poll_keyboard(),
+        reply_markup=keyboard,
     )
-    scheduler.add_job(
-        end_poll,
-        trigger="cron",
-        hour=datetime.now().hour,
-        minute=datetime.now().minute + 1,
-        start_date=datetime.now(),
-        kwargs={"message": message},
-    )
+
+    if is_game:
+        scheduler.add_job(
+            end_poll,
+            trigger="cron",
+            hour=datetime.now().hour,
+            minute=datetime.now().minute + 1,
+            start_date=datetime.now(),
+            kwargs={"message": message},
+        )
 
 
 async def end_poll(message: Message):
@@ -57,7 +61,7 @@ def register_basic_handlers():
         trigger="cron",
         hour=datetime.now().hour,
         minute=datetime.now().minute,
-        second=datetime.now().second + 5,
+        second=datetime.now().second + 1,
         start_date=datetime.now(),
-        kwargs={"chat_bot": bot, "is_new_data": True},
+        kwargs={"chat_bot": bot},
     )

@@ -10,16 +10,17 @@ from src.handlers.poll_text import send_text
 from src.keyboards.inline import get_poll_keyboard
 
 
-@dp.callback_query(F.data.in_({"new_poll", "old_poll"}))
+@dp.callback_query(F.data.in_({"new_poll", "old_poll", "end_poll"}))
 async def restore_poll(call: CallbackQuery):
     is_new_data = True if call.data == "new_poll" else False
+    is_game = False if call.data == "end_poll" else True
     await call.message.delete()
 
     scheduler.add_job(
         get_poll,
         trigger="date",
         run_date=datetime.now(),
-        kwargs={"chat_bot": bot, "is_new_data": is_new_data},
+        kwargs={"chat_bot": bot, "is_new_data": is_new_data, "is_game": is_game},
     )
 
 
