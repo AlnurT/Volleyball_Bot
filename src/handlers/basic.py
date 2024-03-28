@@ -1,49 +1,62 @@
+from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import FSInputFile, Message
 
-from src.base.bot import dp
+from src.base.bot import bot, dp, scheduler
+from src.config import settings
 from src.database.orm import AsyncOrm
-from src.keyboards.inline import get_inline_keyboard
-from src.utils.poll_message import send_text
+from src.handlers.poll_text import send_text
+from src.keyboards.inline import get_keyboard_tables, get_poll_keyboard
 
 
 @dp.message(Command("poll"))
-async def get_poll(message: Message):
-    await AsyncOrm.create_tables()
-    text_for_poll = await send_text()
-    # async with open("src/utils/volleyball.jpg") as photo:
-    #     await message.answer_photo(photo=photo)
+async def get_poll_manually(message: Message):
+    message_id = message.from_user.id
+    await message.delete()
 
-    await message.answer(
-        **text_for_poll.as_kwargs(parse_mode_key=ParseMode.HTML),
-        reply_markup=get_inline_keyboard(),
+    if message_id == settings.BOT_ADMIN_ID:
+        await message.answer(
+            text="Какой опрос восстановить?",
+            reply_markup=get_keyboard_tables(),
+        )
+
+
+async def get_poll(chat_bot: Bot, is_new_data: bool = True, is_game: bool = True):
+    if is_new_data:
+        await AsyncOrm.create_tables()
+
+    text_for_poll = await send_text(is_game)
+    keyboard = get_poll_keyboard() if is_game else None
+
+    message = await chat_bot.send_photo(
+        chat_id=settings.BOT_CHAT_ID,
+        photo=FSInputFile("utils/volleyball.jpg"),
+        caption=text_for_poll.render()[0],
+        parse_mode=ParseMode.HTML,
+        reply_markup=keyboard,
     )
 
-
-@dp.callback_query()
-async def play_game(call: CallbackQuery):
-    user_id = call.from_user.id
-    name = call.from_user.first_name
-    is_change = False
-
-    match call.data:
-        case "is_play_true":
-            is_change = await AsyncOrm.update_pl_status(user_id, name, True)
-        case "is_play_false":
-            is_change = await AsyncOrm.update_pl_status(user_id, name, False)
-        case "plus_extra_pl":
-            is_change = await AsyncOrm.update_extra_pl(user_id, name, extra_pl=1)
-        case "minus_extra_pl":
-            is_change = await AsyncOrm.update_extra_pl(user_id, name, extra_pl=-1)
-
-    if is_change:
-        text_for_poll = await send_text()
-        await call.message.edit_text(
-            **text_for_poll.as_kwargs(parse_mode_key=ParseMode.HTML)
+    if is_game:
+        scheduler.add_job(
+            end_poll,
+            trigger="cron",
+            day_of_week=1,
+            hour=21,
+            kwargs={"message": message},
         )
-        await call.message.edit_reply_markup(reply_markup=get_inline_keyboard())
+
+
+async def end_poll(message: Message):
+    text_for_poll = await send_text(False)
+    await message.edit_caption(caption=text_for_poll.render()[0])
 
 
 def register_basic_handlers():
-    pass
+    scheduler.add_job(
+        get_poll,
+        trigger="cron",
+        day_of_week=0,
+        hour=18,
+        kwargs={"chat_bot": bot},
+    )

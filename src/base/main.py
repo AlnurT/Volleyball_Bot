@@ -3,9 +3,8 @@ import sys
 
 from aiogram.methods import DeleteWebhook
 
-from src.base.bot import bot, dp
-from src.handlers import basic
-from src.utils import info
+from src.base.bot import bot, dp, scheduler
+from src.handlers import basic, callback, info
 
 
 async def main() -> None:
@@ -14,9 +13,10 @@ async def main() -> None:
         format="%(asctime)s - [%(levelname)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
         stream=sys.stdout,
     )
-
+    scheduler.start()
     basic.register_basic_handlers()
     info.register_info_handlers()
+    callback.register_callback_query_handlers()
 
     try:
         await bot(DeleteWebhook(drop_pending_updates=True))
