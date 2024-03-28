@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
@@ -43,9 +41,8 @@ async def get_poll(chat_bot: Bot, is_new_data: bool = True, is_game: bool = True
         scheduler.add_job(
             end_poll,
             trigger="cron",
-            hour=datetime.now().hour,
-            minute=datetime.now().minute + 1,
-            start_date=datetime.now(),
+            day_of_week=1,
+            hour=21,
             kwargs={"message": message},
         )
 
@@ -59,9 +56,7 @@ def register_basic_handlers():
     scheduler.add_job(
         get_poll,
         trigger="cron",
-        hour=datetime.now().hour,
-        minute=datetime.now().minute,
-        second=datetime.now().second + 1,
-        start_date=datetime.now(),
+        day_of_week=0,
+        hour=18,
         kwargs={"chat_bot": bot},
     )

@@ -1,4 +1,3 @@
-from aiogram.utils.markdown import hlink
 from sqlalchemy import desc, select
 
 from src.database.db_base import Base, async_engine, async_session_factory
@@ -9,12 +8,23 @@ class AsyncOrm:
     @staticmethod
     async def get_players_list(is_play: bool):
         async with async_session_factory() as session:
-            query = select(PlayersOrm).filter_by(is_play=is_play)
+            if is_play:
+                query = select(PlayersOrm).filter(PlayersOrm.status != 0)
+            else:
+                query = select(PlayersOrm).filter(PlayersOrm.status == 0)
+
             res = await session.execute(query)
             result = res.scalars().all()
+
             if not result:
-                return [""]
-            return (hlink(pl.user_name, f"tg://user?id={pl.user_id}") for pl in result)
+                return " "
+
+            return (
+                f"<a href='tg://user?id={pl.user_id}'>{pl.user_name}</a>"
+                if pl.status != 2
+                else f"Друг от <a href='tg://user?id={pl.user_id}'>{pl.user_name}</a>"
+                for pl in result
+            )
 
     @staticmethod
     async def create_tables():
@@ -23,7 +33,7 @@ class AsyncOrm:
             await conn.run_sync(Base.metadata.create_all)
 
     @staticmethod
-    async def update_pl_status(user_id: int, user_name: str, is_play: bool):
+    async def update_pl_status(user_id: int, user_name: str, status: int):
         async with async_session_factory() as session:
             query = select(PlayersOrm).filter_by(user_id=user_id, user_name=user_name)
             res = await session.execute(query)
@@ -33,16 +43,16 @@ class AsyncOrm:
                 player = PlayersOrm(
                     user_id=user_id,
                     user_name=user_name,
-                    is_play=is_play,
+                    status=status,
                 )
                 session.add(player)
                 await session.commit()
                 return True
 
-            if result.is_play is is_play:
+            if result.status == status:
                 return False
 
-            result.is_play = is_play
+            result.status = status
             await session.commit()
             return True
 
@@ -50,16 +60,14 @@ class AsyncOrm:
     async def update_extra_pl(user_id: int, user_name: str, extra_pl: int):
         async with async_session_factory() as session:
             if extra_pl == 1:
-                player = PlayersOrm(
-                    user_id=user_id, user_name=f"{user_name} +1", is_play=True
-                )
+                player = PlayersOrm(user_id=user_id, user_name=user_name, status=2)
                 session.add(player)
                 await session.commit()
                 return True
 
             query = (
                 select(PlayersOrm)
-                .filter_by(user_id=user_id, user_name=f"{user_name} +1")
+                .filter_by(user_id=user_id, user_name=user_name)
                 .order_by(desc(PlayersOrm.id_num))
             )
             res = await session.execute(query)

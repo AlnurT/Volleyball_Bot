@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytz
 from aiogram import F
 from aiogram.types import CallbackQuery
 
@@ -19,7 +20,7 @@ async def restore_poll(call: CallbackQuery):
     scheduler.add_job(
         get_poll,
         trigger="date",
-        run_date=datetime.now(),
+        run_date=datetime.now(tz=pytz.timezone("Europe/Moscow")),
         kwargs={"chat_bot": bot, "is_new_data": is_new_data, "is_game": is_game},
     )
 
@@ -30,11 +31,11 @@ async def play_game(call: CallbackQuery):
     name = call.from_user.full_name
 
     if call.data in ("is_play_true", "is_play_false"):
-        is_game = True if call.data == "is_play_true" else False
-        is_change = await AsyncOrm.update_pl_status(user_id, name, is_game)
+        status = 1 if call.data == "is_play_true" else 0
+        is_change = await AsyncOrm.update_pl_status(user_id, name, status)
     else:
         extra_pl = 1 if call.data == "plus_extra_pl" else -1
-        is_change = await AsyncOrm.update_extra_pl(user_id, name, extra_pl=extra_pl)
+        is_change = await AsyncOrm.update_extra_pl(user_id, name, extra_pl)
 
     if is_change:
         text_for_poll = await send_text()
