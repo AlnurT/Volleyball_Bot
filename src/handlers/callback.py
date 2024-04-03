@@ -7,7 +7,7 @@ from aiogram.types import CallbackQuery
 from src.base.bot import bot, dp, scheduler
 from src.database.orm import AsyncOrm
 from src.handlers.basic import get_poll
-from src.handlers.poll_text import send_text
+from src.handlers.poll_text import send_poll
 from src.keyboards.inline import get_poll_keyboard
 
 
@@ -38,7 +38,7 @@ async def play_game(call: CallbackQuery):
         is_change = await AsyncOrm.update_extra_pl(user_id, name, extra_pl)
 
     if is_change:
-        text_for_poll = await send_text()
+        text_for_poll = await send_poll()
         await call.message.edit_caption(
             caption=text_for_poll.render()[0], reply_markup=get_poll_keyboard()
         )

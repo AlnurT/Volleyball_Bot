@@ -1,4 +1,4 @@
-from sqlalchemy import desc, select
+from sqlalchemy import select
 
 from src.database.db_base import Base, async_engine, async_session_factory
 from src.database.models import PlayersOrm
@@ -19,12 +19,12 @@ class AsyncOrm:
             if not result:
                 return " "
 
-            return (
+            return [
                 f"<a href='tg://user?id={pl.user_id}'>{pl.user_name}</a>"
                 if pl.status != 2
-                else f"Друг от <a href='tg://user?id={pl.user_id}'>{pl.user_name}</a>"
+                else f"Игрок от <a href='tg://user?id={pl.user_id}'>{pl.user_name}</a>"
                 for pl in result
-            )
+            ]
 
     @staticmethod
     async def create_tables():
@@ -35,7 +35,11 @@ class AsyncOrm:
     @staticmethod
     async def update_pl_status(user_id: int, user_name: str, status: int):
         async with async_session_factory() as session:
-            query = select(PlayersOrm).filter_by(user_id=user_id, user_name=user_name)
+            query = select(PlayersOrm).filter(
+                PlayersOrm.user_id == user_id,
+                PlayersOrm.user_name == user_name,
+                PlayersOrm.status != 2,
+            )
             res = await session.execute(query)
             result = res.scalars().first()
 
@@ -65,10 +69,8 @@ class AsyncOrm:
                 await session.commit()
                 return True
 
-            query = (
-                select(PlayersOrm)
-                .filter_by(user_id=user_id, user_name=user_name)
-                .order_by(desc(PlayersOrm.id_num))
+            query = select(PlayersOrm).filter_by(
+                user_id=user_id, user_name=user_name, status=2
             )
             res = await session.execute(query)
             result = res.scalars().first()

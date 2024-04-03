@@ -6,7 +6,7 @@ from aiogram.types import FSInputFile, Message
 from src.base.bot import bot, dp, scheduler
 from src.config import settings
 from src.database.orm import AsyncOrm
-from src.handlers.poll_text import send_text
+from src.handlers.poll_text import send_end_of_poll, send_poll
 from src.keyboards.inline import get_keyboard_tables, get_poll_keyboard
 
 
@@ -26,7 +26,7 @@ async def get_poll(chat_bot: Bot, is_new_data: bool = True, is_game: bool = True
     if is_new_data:
         await AsyncOrm.create_tables()
 
-    text_for_poll = await send_text(is_game)
+    text_for_poll = await send_poll()
     keyboard = get_poll_keyboard() if is_game else None
 
     message = await chat_bot.send_photo(
@@ -48,7 +48,7 @@ async def get_poll(chat_bot: Bot, is_new_data: bool = True, is_game: bool = True
 
 
 async def end_poll(message: Message):
-    text_for_poll = await send_text(False)
+    text_for_poll = await send_end_of_poll()
     await message.edit_caption(caption=text_for_poll.render()[0])
 
 
