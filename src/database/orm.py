@@ -1,23 +1,26 @@
+from typing import List
+
 from sqlalchemy import select
 
-from src.database.db_base import Base, async_engine, async_session_factory
+from src.database.db_base import ASYNC_ENGINE, ASYNC_SESSION, Base
 from src.database.models import PlayersOrm
 
 
 class AsyncOrm:
     @staticmethod
-    async def get_players_list(is_play: bool):
-        async with async_session_factory() as session:
-            if is_play:
-                query = select(PlayersOrm).filter(PlayersOrm.status != 0)
-            else:
-                query = select(PlayersOrm).filter(PlayersOrm.status == 0)
+    async def get_players_list(is_play: bool) -> List[str]:
+        async with ASYNC_SESSION() as session:
+            query = (
+                select(PlayersOrm).filter(PlayersOrm.status != 0)
+                if is_play
+                else select(PlayersOrm).filter(PlayersOrm.status == 0)
+            )
 
             res = await session.execute(query)
             result = res.scalars().all()
 
             if not result:
-                return " "
+                return [""]
 
             return [
                 f"<a href='tg://user?id={pl.user_id}'>{pl.user_name}</a>"
@@ -27,14 +30,14 @@ class AsyncOrm:
             ]
 
     @staticmethod
-    async def create_tables():
-        async with async_engine.begin() as conn:
+    async def create_tables() -> None:
+        async with ASYNC_ENGINE.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
 
     @staticmethod
-    async def update_pl_status(user_id: int, user_name: str, status: int):
-        async with async_session_factory() as session:
+    async def update_pl_status(user_id: int, user_name: str, status: int) -> bool:
+        async with ASYNC_SESSION() as session:
             query = select(PlayersOrm).filter(
                 PlayersOrm.user_id == user_id,
                 PlayersOrm.user_name == user_name,
@@ -61,8 +64,8 @@ class AsyncOrm:
             return True
 
     @staticmethod
-    async def update_extra_pl(user_id: int, user_name: str, extra_pl: int):
-        async with async_session_factory() as session:
+    async def update_extra_pl(user_id: int, user_name: str, extra_pl: int) -> bool:
+        async with ASYNC_SESSION() as session:
             if extra_pl == 1:
                 player = PlayersOrm(user_id=user_id, user_name=user_name, status=2)
                 session.add(player)

@@ -4,29 +4,29 @@ import pytz
 from aiogram import F
 from aiogram.types import CallbackQuery
 
-from src.base.bot import bot, dp, scheduler
+from src.base.bot import BOT, DP, SCHEDULER
 from src.database.orm import AsyncOrm
 from src.handlers.basic import get_poll
 from src.handlers.poll_text import send_poll
 from src.keyboards.inline import get_poll_keyboard
 
 
-@dp.callback_query(F.data.in_({"new_poll", "old_poll", "end_poll"}))
-async def restore_poll(call: CallbackQuery):
+@DP.callback_query(F.data.in_({"new_poll", "old_poll", "end_poll"}))
+async def restore_poll(call: CallbackQuery) -> None:
     is_new_data = True if call.data == "new_poll" else False
     is_game = False if call.data == "end_poll" else True
     await call.message.delete()
 
-    scheduler.add_job(
+    SCHEDULER.add_job(
         get_poll,
         trigger="date",
         run_date=datetime.now(tz=pytz.timezone("Europe/Moscow")),
-        kwargs={"chat_bot": bot, "is_new_data": is_new_data, "is_game": is_game},
+        kwargs={"chat_bot": BOT, "is_new_data": is_new_data, "is_game": is_game},
     )
 
 
-@dp.callback_query()
-async def play_game(call: CallbackQuery):
+@DP.callback_query()
+async def play_game(call: CallbackQuery) -> None:
     user_id = call.from_user.id
     name = call.from_user.full_name
 
@@ -44,5 +44,5 @@ async def play_game(call: CallbackQuery):
         )
 
 
-def register_callback_query_handlers():
+def register_callback_query_handlers() -> None:
     pass

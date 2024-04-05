@@ -5,14 +5,14 @@ from aiogram.utils.formatting import Text, as_list
 from src.database.orm import AsyncOrm
 
 
-def my_numbered_list(*items):
+def my_numbered_list(*items) -> Text:
     fmt = "      <code>{:<3}</code> "
     return as_list(
         *(Text(fmt.format(f"{index}."), item) for index, item in enumerate(items, 1))
     )
 
 
-async def send_poll():
+async def send_poll() -> Text:
     players_list = await AsyncOrm.get_players_list(True)
     not_players_list = await AsyncOrm.get_players_list(False)
     reserve = ""
@@ -31,7 +31,7 @@ async def send_poll():
     )
 
 
-async def send_end_of_poll():
+async def send_end_of_poll() -> Text:
     players_list = await AsyncOrm.get_players_list(True)
     day = datetime.now().strftime("%d.%m")
 

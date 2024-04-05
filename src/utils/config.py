@@ -12,10 +12,10 @@ class Settings:
     DB_NAME: str
 
     @property
-    def database_url_asyncpg(self):
+    def database_url_asyncpg(self) -> str:
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
-    def get_settings(self, path: str):
+    def get_settings(self, path: str) -> None:
         env = Env()
         env.read_env(path)
 
@@ -27,7 +27,3 @@ class Settings:
         self.DB_NAME = env.str("DB_NAME")
         self.DB_HOST = env.str("DB_HOST")
         self.DB_PORT = env.int("DB_PORT")
-
-
-settings = Settings()
-settings.get_settings(".env")

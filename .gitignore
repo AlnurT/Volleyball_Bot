@@ -1,3 +1,2 @@
 .idea/
-src/.env
-probe.py
+src/utils/.env
