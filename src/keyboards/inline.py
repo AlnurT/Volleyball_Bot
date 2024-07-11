@@ -3,6 +3,11 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 def get_poll_keyboard() -> InlineKeyboardMarkup:
+    """
+    Клавиатура опроса игроков
+
+    :return: Клавиатура в сообщении
+    """
     keyboard_builder = InlineKeyboardBuilder()
 
     keyboard_builder.button(text="Буду играть 👍", callback_data="is_play_true")
@@ -15,6 +20,11 @@ def get_poll_keyboard() -> InlineKeyboardMarkup:
 
 
 def get_keyboard_tables() -> InlineKeyboardMarkup:
+    """
+    Клавиатура опроса статуса опроса (только для админа)
+
+    :return: Клавиатура в сообщении
+    """
     keyboard_builder = InlineKeyboardBuilder()
 
     keyboard_builder.button(text="Новый опрос", callback_data="new_poll")

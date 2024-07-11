@@ -2,10 +2,16 @@ from datetime import datetime
 
 from aiogram.utils.formatting import Text, as_list
 
-from src.database.orm import AsyncOrm
+from src.database.orm import VlPlayersOrm
 
 
 def my_numbered_list(*items) -> Text:
+    """
+    Функция для тонкой настройки вывода игроков
+
+    :param items: Список игроков
+    :return: Форматированный список игроков
+    """
     fmt = "      <code>{:<3}</code> "
     return as_list(
         *(Text(fmt.format(f"{index}."), item) for index, item in enumerate(items, 1))
@@ -13,8 +19,13 @@ def my_numbered_list(*items) -> Text:
 
 
 async def send_poll() -> Text:
-    players_list = await AsyncOrm.get_players_list(True)
-    not_players_list = await AsyncOrm.get_players_list(False)
+    """
+    Вывод текстовой части опроса при голосовании
+
+    :return: Текст опроса по строкам
+    """
+    players_list = await VlPlayersOrm.get_players_list(True)
+    not_players_list = await VlPlayersOrm.get_players_list(False)
     reserve = ""
 
     if len(players_list) > 14:
@@ -32,7 +43,12 @@ async def send_poll() -> Text:
 
 
 async def send_end_of_poll() -> Text:
-    players_list = await AsyncOrm.get_players_list(True)
+    """
+    Вывод текстовой части опроса после голосования
+
+    :return: Текст опроса по строкам
+    """
+    players_list = await VlPlayersOrm.get_players_list(True)
     day = datetime.now().strftime("%d.%m")
 
     return as_list(

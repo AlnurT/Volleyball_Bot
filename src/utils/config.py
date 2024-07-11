@@ -2,6 +2,8 @@ from environs import Env
 
 
 class Settings:
+    """Класс настройки базы данных и бота"""
+
     BOT_TOKEN: str
     BOT_ADMIN_ID: int
     BOT_CHAT_ID: int
@@ -13,9 +15,15 @@ class Settings:
 
     @property
     def database_url_asyncpg(self) -> str:
+        """Настройка доступа к БД"""
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     def get_settings(self, path: str) -> None:
+        """
+        Привязка переменных бота и БД
+
+        :param path: Путь к данным бота и БД для подключения
+        """
         env = Env()
         env.read_env(path)
 

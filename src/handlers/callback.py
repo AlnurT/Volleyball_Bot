@@ -5,7 +5,7 @@ from aiogram import F
 from aiogram.types import CallbackQuery
 
 from src.base.bot import BOT, DP, SCHEDULER
-from src.database.orm import AsyncOrm
+from src.database.orm import VlPlayersOrm
 from src.handlers.basic import get_poll
 from src.handlers.poll_text import send_poll
 from src.keyboards.inline import get_poll_keyboard
@@ -13,6 +13,11 @@ from src.keyboards.inline import get_poll_keyboard
 
 @DP.callback_query(F.data.in_({"new_poll", "old_poll", "end_poll"}))
 async def restore_poll(call: CallbackQuery) -> None:
+    """
+    Запуск расписания опроса с параметрами (ручной запуск опроса админом)
+
+    :param call: Ответ при выборе админа статуса опроса (новый, старый или закрытый)
+    """
     is_new_data = True if call.data == "new_poll" else False
     is_game = False if call.data == "end_poll" else True
     await call.message.delete()
@@ -27,15 +32,20 @@ async def restore_poll(call: CallbackQuery) -> None:
 
 @DP.callback_query()
 async def play_game(call: CallbackQuery) -> None:
-    user_id = call.from_user.id
+    """
+    Изменение списков опроса при нажатии на кнопки
+
+    :param call: Ответ при выборе игрока о желании присутствовать на игре
+    """
+    user_id = str(call.from_user.id)
     name = call.from_user.full_name
 
     if call.data in ("is_play_true", "is_play_false"):
         status = 1 if call.data == "is_play_true" else 0
-        is_change = await AsyncOrm.update_pl_status(user_id, name, status)
+        is_change = await VlPlayersOrm.update_pl_status(user_id, name, status)
     else:
         extra_pl = 1 if call.data == "plus_extra_pl" else -1
-        is_change = await AsyncOrm.update_extra_pl(user_id, name, extra_pl)
+        is_change = await VlPlayersOrm.update_extra_pl(user_id, name, extra_pl)
 
     if is_change:
         text_for_poll = await send_poll()
@@ -45,4 +55,5 @@ async def play_game(call: CallbackQuery) -> None:
 
 
 def register_callback_query_handlers() -> None:
+    """Регистрация ответов на нажатие кнопок"""
     pass

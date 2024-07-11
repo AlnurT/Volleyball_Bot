@@ -2,13 +2,20 @@ from typing import List
 
 from sqlalchemy import select
 
-from src.database.db_base import ASYNC_ENGINE, ASYNC_SESSION, Base
-from src.database.models import PlayersOrm
+from src.database.models import ASYNC_ENGINE, ASYNC_SESSION, Base, PlayersOrm
 
 
-class AsyncOrm:
+class VlPlayersOrm:
+    """Класс для работы с базой данных"""
+
     @staticmethod
     async def get_players_list(is_play: bool) -> List[str]:
+        """
+        Получение списка игроков со ссылкой на аккаунт в телеграмме
+
+        :param is_play: Флаг для списка играющих или неиграющих игроков
+        :return: Список игроков
+        """
         async with ASYNC_SESSION() as session:
             query = (
                 select(PlayersOrm).filter(PlayersOrm.status != 0)
@@ -30,13 +37,22 @@ class AsyncOrm:
             ]
 
     @staticmethod
-    async def create_tables() -> None:
+    async def create_new_tables() -> None:
+        """Очистка и создание таблицы"""
         async with ASYNC_ENGINE.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
 
     @staticmethod
-    async def update_pl_status(user_id: int, user_name: str, status: int) -> bool:
+    async def update_pl_status(user_id: str, user_name: str, status: int) -> bool:
+        """
+        Изменение статуса игроков в базе данных
+
+        :param user_id: ID игрока
+        :param user_name: Полное имя игрока
+        :param status: Статус игрока (0 - нет, 1 - да, 2 - будет гость)
+        :return: Флаг для внесения изменений в базу данных
+        """
         async with ASYNC_SESSION() as session:
             query = select(PlayersOrm).filter(
                 PlayersOrm.user_id == user_id,
@@ -64,7 +80,15 @@ class AsyncOrm:
             return True
 
     @staticmethod
-    async def update_extra_pl(user_id: int, user_name: str, extra_pl: int) -> bool:
+    async def update_extra_pl(user_id: str, user_name: str, extra_pl: int) -> bool:
+        """
+        Изменение статуса гостей в базе данных
+
+        :param user_id: ID игрока
+        :param user_name: Полное имя игрока
+        :param extra_pl: Количество гостей для добавления(+1) или удаления(-1) в базе данных
+        :return: Флаг для внесения изменений в базу данных
+        """
         async with ASYNC_SESSION() as session:
             if extra_pl == 1:
                 player = PlayersOrm(user_id=user_id, user_name=user_name, status=2)
