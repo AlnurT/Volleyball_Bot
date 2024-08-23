@@ -1,72 +1,77 @@
-from aiogram.utils.markdown import hlink
-from sqlalchemy import desc, select
+from typing import Sequence
 
-from src.database.db_base import Base, async_engine, async_session_factory
-from src.database.models import PlayersOrm
+from sqlalchemy import select, exists
+
+from src.database.models import ASYNC_ENGINE, ASYNC_SESSION, PlayersOrm
 
 
-class AsyncOrm:
-    @staticmethod
-    async def get_players_list(is_play: bool):
-        async with async_session_factory() as session:
-            query = select(PlayersOrm).filter_by(is_play=is_play)
-            res = await session.execute(query)
-            result = res.scalars().all()
-            if not result:
-                return [""]
-            return [hlink(pl.user_name, f"tg://user?id={pl.user_id}") for pl in result]
+class VlPlayersOrm:
+    """Класс для работы с базой данных"""
 
     @staticmethod
-    async def create_tables():
-        async with async_engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
-            await conn.run_sync(Base.metadata.create_all)
+    async def create_table() -> None:
+        """Удаление и создание таблицы"""
+        async with ASYNC_ENGINE.begin() as conn:
+            await conn.run_sync(PlayersOrm.metadata.drop_all)
+            await conn.run_sync(PlayersOrm.metadata.create_all)
 
     @staticmethod
-    async def update_pl_status(user_id: int, user_name: str, is_play: bool):
-        async with async_session_factory() as session:
-            query = select(PlayersOrm).filter_by(user_id=user_id, user_name=user_name)
-            res = await session.execute(query)
-            result = res.scalars().first()
+    async def get_players() -> Sequence:
+        """
+        Получение списка игроков со ссылкой на аккаунт в телеграмме
 
-            if not result:
-                player = PlayersOrm(
-                    user_id=user_id,
-                    user_name=user_name,
-                    is_play=is_play,
+        :return: Список игроков
+        """
+        async with ASYNC_SESSION() as session:
+            query = select(PlayersOrm)
+            players = await session.scalars(query)
+            return players.all()
+
+    @staticmethod
+    async def add_player(user_id: str, name: str, status: str) -> bool:
+        """
+        Добавление игрока в базу данных
+
+        :param user_id: ID игрока
+        :param name: имя игрока
+        :param status: статус игрока
+        :return: флаг для внесения изменений в базу данных
+        """
+        async with ASYNC_SESSION() as session:
+            player = await session.execute(
+                select(exists().where(
+                    PlayersOrm.user_id == user_id,
+                    PlayersOrm.status == status)
                 )
-                session.add(player)
-                await session.commit()
-                return True
+            )
 
-            if result.is_play is is_play:
+            if player.scalar() and status == "player":
                 return False
 
-            result.is_play = is_play
+            session.add(
+                PlayersOrm(user_id=user_id, name=name, status=status)
+            )
             await session.commit()
             return True
 
     @staticmethod
-    async def update_extra_pl(user_id: int, user_name: str, extra_pl: int):
-        async with async_session_factory() as session:
-            if extra_pl == 1:
-                player = PlayersOrm(
-                    user_id=user_id, user_name=f"{user_name} +1", is_play=True
-                )
-                session.add(player)
-                await session.commit()
-                return True
+    async def remove_player(user_id: str, status: str) -> bool:
+        """
+        Удаление игрока из базы данных
 
-            query = (
-                select(PlayersOrm)
-                .filter_by(user_id=user_id, user_name=f"{user_name} +1")
-                .order_by(desc(PlayersOrm.id_num))
+        :param user_id: ID игрока
+        :param status: статус игрока
+        :return: флаг для внесения изменений в базу данных
+        """
+        async with ASYNC_SESSION() as session:
+            player = await session.scalar(
+                select(PlayersOrm).
+                filter_by(user_id=user_id, status=status)
             )
-            res = await session.execute(query)
-            result = res.scalars().first()
-            if result is None:
+
+            if not player:
                 return False
 
-            await session.delete(result)
+            await session.delete(player)
             await session.commit()
             return True

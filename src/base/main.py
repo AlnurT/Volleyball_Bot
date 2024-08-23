@@ -3,23 +3,36 @@ import sys
 
 from aiogram.methods import DeleteWebhook
 
-from src.base.bot import bot, dp
-from src.handlers import basic
-from src.utils import info
+from src.base.bot import BOT, DP, SCHEDULER
+from src.handlers import make_poll, callback, message
+from src.utils.commands import set_main_menu
 
 
 async def main() -> None:
+    """
+    Ядро бота для регистрации хэндлеров, расписания и логирования операций
+    """
     logging.basicConfig(
         level=logging.INFO,
-        format="%(asctime)s - [%(levelname)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
+        format="%(asctime)s - [%(levelname)s] - %(name)s - "
+               "(%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
         stream=sys.stdout,
     )
+    await set_main_menu(BOT)
 
-    basic.register_basic_handlers()
-    info.register_info_handlers()
+    SCHEDULER.start()
+    callback.register_callback_query()
+    message.register_message()
+
+    SCHEDULER.add_job(
+        make_poll.start_poll,
+        trigger="cron",
+        day_of_week="sun",
+        hour=18,
+    )
 
     try:
-        await bot(DeleteWebhook(drop_pending_updates=True))
-        await dp.start_polling(bot)
+        await BOT(DeleteWebhook(drop_pending_updates=True))
+        await DP.start_polling(BOT)
     finally:
-        await bot.session.close()
+        await BOT.session.close()
