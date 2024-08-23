@@ -1,36 +1,24 @@
-from datetime import datetime
-
-import pytz
 from aiogram import F
 from aiogram.types import CallbackQuery
 
-from src.base.bot import BOT, DP, SCHEDULER
+from src.base.bot import DP
 from src.database.orm import VlPlayersOrm
-from src.handlers.basic import get_poll
-from src.handlers.poll_text import send_poll
+from src.handlers.make_poll import get_poll
+from src.handlers.poll_text import TextPoll
 from src.keyboards.inline import get_poll_keyboard
 
 
-@DP.callback_query(F.data.in_({"new_poll", "old_poll", "end_poll"}))
-async def restore_poll(call: CallbackQuery) -> None:
-    """
-    Запуск расписания опроса с параметрами (ручной запуск опроса админом)
+@DP.callback_query(F.data.in_({"new", "old"}))
+async def create_poll(call: CallbackQuery) -> None:
+    """Ручной запуск опроса админом"""
+    if call.data == "new":
+        await VlPlayersOrm.create_table()
 
-    :param call: Ответ при выборе админа статуса опроса (новый, старый или закрытый)
-    """
-    is_new_data = True if call.data == "new_poll" else False
-    is_game = False if call.data == "end_poll" else True
     await call.message.delete()
-
-    SCHEDULER.add_job(
-        get_poll,
-        trigger="date",
-        run_date=datetime.now(tz=pytz.timezone("Europe/Moscow")),
-        kwargs={"chat_bot": BOT, "is_new_data": is_new_data, "is_game": is_game},
-    )
+    await get_poll()
 
 
-@DP.callback_query()
+@DP.callback_query(F.data.in_({"play", "not_play", "plus", "minus"}))
 async def play_game(call: CallbackQuery) -> None:
     """
     Изменение списков опроса при нажатии на кнопки
@@ -38,22 +26,29 @@ async def play_game(call: CallbackQuery) -> None:
     :param call: Ответ при выборе игрока о желании присутствовать на игре
     """
     user_id = str(call.from_user.id)
-    name = call.from_user.full_name
+    name = call.from_user.first_name
 
-    if call.data in ("is_play_true", "is_play_false"):
-        status = 1 if call.data == "is_play_true" else 0
-        is_change = await VlPlayersOrm.update_pl_status(user_id, name, status)
-    else:
-        extra_pl = 1 if call.data == "plus_extra_pl" else -1
-        is_change = await VlPlayersOrm.update_extra_pl(user_id, name, extra_pl)
+    match call.data:
+        case "play":
+            is_change = await VlPlayersOrm.add_player(user_id, name, "player")
+        case "plus":
+            is_change = await VlPlayersOrm.add_player(user_id, name, "guest")
+        case "not_play":
+            is_change = await VlPlayersOrm.remove_player(user_id, "player")
+        case _:
+            is_change = await VlPlayersOrm.remove_player(user_id, "guest")
 
-    if is_change:
-        text_for_poll = await send_poll()
-        await call.message.edit_caption(
-            caption=text_for_poll.render()[0], reply_markup=get_poll_keyboard()
-        )
+    if not is_change:
+        return
+
+    players = await VlPlayersOrm.get_players()
+    text_for_poll = TextPoll.send_poll(players)
+
+    await call.message.edit_caption(
+        caption=text_for_poll, reply_markup=get_poll_keyboard()
+    )
 
 
-def register_callback_query_handlers() -> None:
+def register_callback_query() -> None:
     """Регистрация ответов на нажатие кнопок"""
     pass
