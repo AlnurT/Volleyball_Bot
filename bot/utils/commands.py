@@ -1,7 +1,7 @@
 from aiogram import Bot
 from aiogram.types import BotCommand, BotCommandScopeChatMember
 
-from src.base.bot import SETTINGS
+from config import SETTINGS
 
 
 async def set_main_menu(bot: Bot):

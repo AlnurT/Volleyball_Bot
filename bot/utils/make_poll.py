@@ -1,10 +1,12 @@
+import os
+
 from aiogram.enums import ParseMode
 from aiogram.types import FSInputFile, Message
 
-from src.base.bot import BOT, SCHEDULER, SETTINGS
-from src.database.orm import VlPlayersOrm
-from src.handlers.poll_text import TextPoll
-from src.keyboards.inline import get_poll_keyboard
+from bot.database.orm import VlPlayersOrm
+from bot.keyboards.inline import get_poll_keyboard
+from bot.utils.poll_text import TextPoll
+from config import BOT, SETTINGS, SCHEDULER
 
 
 async def get_poll() -> None:
@@ -15,7 +17,7 @@ async def get_poll() -> None:
 
     message = await BOT.send_photo(
         chat_id=SETTINGS.BOT_CHAT_ID,
-        photo=FSInputFile("utils/volleyball.jpg"),
+        photo=FSInputFile(os.path.abspath("bot/images/volleyball.jpg")),
         caption=text_for_poll,
         parse_mode=ParseMode.HTML,
         reply_markup=get_poll_keyboard(),

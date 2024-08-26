@@ -1,9 +1,8 @@
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from src.base.bot import DP, BOT
-
-from src.keyboards.inline import get_action_keyboard
+from bot.keyboards.inline import get_action_keyboard
+from config import BOT, DP
 
 
 @DP.message(Command("action"))

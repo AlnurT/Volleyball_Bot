@@ -1,3 +1,7 @@
+from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from environs import Env
 
 
@@ -16,7 +20,9 @@ class Settings:
     @property
     def database_url_asyncpg(self) -> str:
         """Настройка доступа к БД"""
-        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return f"postgresql+asyncpg://" \
+               f"{self.DB_USER}:{self.DB_PASS}" \
+               f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     def get_settings(self, path: str) -> None:
         """
@@ -35,3 +41,14 @@ class Settings:
         self.DB_NAME = env.str("DB_NAME")
         self.DB_HOST = env.str("DB_HOST")
         self.DB_PORT = env.int("DB_PORT")
+
+
+SETTINGS = Settings()
+SETTINGS.get_settings(path=".env")
+SCHEDULER = AsyncIOScheduler(timezone="Europe/Moscow")
+
+BOT = Bot(
+    SETTINGS.BOT_TOKEN,
+    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+)
+DP = Dispatcher()

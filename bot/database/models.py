@@ -1,11 +1,11 @@
-import enum
 from typing import Annotated
 
 from sqlalchemy import String
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from src.base.bot import SETTINGS
+from config import SETTINGS
+
 
 ASYNC_ENGINE = create_async_engine(
     url=SETTINGS.database_url_asyncpg,

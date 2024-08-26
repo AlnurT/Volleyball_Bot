@@ -1,11 +1,11 @@
 from aiogram import F
 from aiogram.types import CallbackQuery
 
-from src.base.bot import DP
-from src.database.orm import VlPlayersOrm
-from src.handlers.make_poll import get_poll
-from src.handlers.poll_text import TextPoll
-from src.keyboards.inline import get_poll_keyboard
+from config import DP
+from bot.database.orm import VlPlayersOrm
+from bot.utils.make_poll import get_poll
+from bot.utils.poll_text import TextPoll
+from bot.keyboards.inline import get_poll_keyboard
 
 
 @DP.callback_query(F.data.in_({"new", "old"}))
