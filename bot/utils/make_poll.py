@@ -4,7 +4,7 @@ from aiogram.enums import ParseMode
 from aiogram.types import FSInputFile, Message
 
 from bot.database.orm import VlPlayersOrm
-from bot.keyboards.inline import get_poll_keyboard
+from bot.keyboards.inline import get_poll_keyboard, get_end_keyboard
 from bot.utils.poll_text import TextPoll
 from config import BOT, SETTINGS, SCHEDULER
 
@@ -40,7 +40,9 @@ async def end_poll(message: Message) -> None:
     players = await VlPlayersOrm.get_players()
     text_for_poll = TextPoll.send_poll(players, True)
 
-    await message.edit_caption(caption=text_for_poll)
+    await message.edit_caption(
+        caption=text_for_poll, reply_markup=get_end_keyboard(),
+    )
 
 
 async def start_poll() -> None:

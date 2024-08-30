@@ -1,13 +1,10 @@
-from aiogram.types import InlineKeyboardMarkup, WebAppInfo
+from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 def get_poll_keyboard() -> InlineKeyboardMarkup:
-    """
-    Клавиатура опроса игроков
+    """Клавиатура опроса игроков"""
 
-    :return: Клавиатура в сообщении
-    """
     keyboard_builder = InlineKeyboardBuilder()
 
     keyboard_builder.button(text="Буду играть 👍", callback_data="play")
@@ -23,12 +20,22 @@ def get_poll_keyboard() -> InlineKeyboardMarkup:
     return keyboard_builder.as_markup()
 
 
-def get_action_keyboard() -> InlineKeyboardMarkup:
-    """
-    Клавиатура действий админа
+def get_end_keyboard() -> InlineKeyboardMarkup:
+    """Клавиатура конца опроса"""
 
-    :return: Клавиатура в сообщении
-    """
+    keyboard_builder = InlineKeyboardBuilder()
+
+    keyboard_builder.button(
+        text="Подробнее ⚡️",
+        url="https://t.me/alnurs_test_bot?startapp",
+    )
+
+    return keyboard_builder.as_markup()
+
+
+def get_action_keyboard() -> InlineKeyboardMarkup:
+    """Клавиатура действий админа"""
+
     keyboard_builder = InlineKeyboardBuilder()
 
     keyboard_builder.button(text="Новый опрос", callback_data="new")
