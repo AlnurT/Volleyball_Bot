@@ -2,7 +2,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from bot.keyboards.inline import get_action_keyboard
-from config import BOT, DP
+from config import BOT, DP, SETTINGS
 
 
 @DP.message(Command("action"))
@@ -12,6 +12,9 @@ async def get_admin_keyboard(message: Message) -> None:
 
     :param message: Сообщение пользователя
     """
+    if message.from_user.id != SETTINGS.BOT_ADMIN_ID:
+        return
+
     await message.delete()
     await BOT.send_message(
         chat_id=message.chat.id,

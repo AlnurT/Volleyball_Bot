@@ -14,7 +14,10 @@ def get_poll_keyboard() -> InlineKeyboardMarkup:
     keyboard_builder.button(text="Не смогу 👎", callback_data="not_play")
     keyboard_builder.button(text="+1 игрок 🤝", callback_data="plus")
     keyboard_builder.button(text="-1 игрок 🚷", callback_data="minus")
-    keyboard_builder.button(text="Подробнее ⚡️", callback_data="details")
+    keyboard_builder.button(
+        text="Подробнее ⚡️",
+        url="https://t.me/alnurs_test_bot?startapp",
+    )
     keyboard_builder.adjust(2, 2, 1)
 
     return keyboard_builder.as_markup()
