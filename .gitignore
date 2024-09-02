@@ -1,4 +1,4 @@
-/web_app
+web_app/
 .idea/
 .env
-.log
+*.log
