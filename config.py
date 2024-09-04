@@ -3,6 +3,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from environs import Env
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 
 class Settings:
@@ -11,18 +12,18 @@ class Settings:
     BOT_TOKEN: str
     BOT_ADMIN_ID: int
     BOT_CHAT_ID: int
-    DB_HOST: str
-    DB_PORT: int
-    DB_USER: str
-    DB_PASS: str
-    DB_NAME: str
+    PG_HOST: str
+    PG_PORT: int
+    PG_DB: str
+    PG_USER: str
+    PG_PASS: str
 
     @property
     def database_url_asyncpg(self) -> str:
         """Настройка доступа к БД"""
         return f"postgresql+asyncpg://" \
-               f"{self.DB_USER}:{self.DB_PASS}" \
-               f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+               f"{self.PG_USER}:{self.PG_PASS}" \
+               f"@{self.PG_HOST}:{self.PG_PORT}/{self.PG_DB}"
 
     def get_settings(self, path: str) -> None:
         """
@@ -36,15 +37,22 @@ class Settings:
         self.BOT_TOKEN = env.str("BOT_TOKEN")
         self.BOT_ADMIN_ID = env.int("ADMIN_ID")
         self.BOT_CHAT_ID = env.int("CHAT_ID")
-        self.DB_USER = env.str("DB_USER")
-        self.DB_PASS = env.str("DB_PASS")
-        self.DB_NAME = env.str("DB_NAME")
-        self.DB_HOST = env.str("DB_HOST")
-        self.DB_PORT = env.int("DB_PORT")
+        self.PG_HOST = env.str("POSTGRES_HOST")
+        self.PG_PORT = env.str("POSTGRES_PORT")
+        self.PG_DB = env.str("POSTGRES_DB")
+        self.PG_USER = env.str("POSTGRES_USER")
+        self.PG_PASS = env.str("POSTGRES_PASSWORD")
 
 
 SETTINGS = Settings()
 SETTINGS.get_settings(path=".env")
+
+ASYNC_ENGINE = create_async_engine(
+    url=SETTINGS.database_url_asyncpg,
+    echo=False,
+)
+ASYNC_SESSION = async_sessionmaker(ASYNC_ENGINE)
+
 SCHEDULER = AsyncIOScheduler(timezone="Europe/Moscow")
 
 BOT = Bot(

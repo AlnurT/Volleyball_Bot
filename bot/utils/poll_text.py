@@ -84,5 +84,3 @@ class TextPoll:
             return cls._poll(pl)
 
         return cls._poll_with_reserve(pl)
-
-

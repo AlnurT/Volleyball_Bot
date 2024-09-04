@@ -2,7 +2,8 @@ from typing import Sequence
 
 from sqlalchemy import select, exists
 
-from bot.database.models import ASYNC_ENGINE, ASYNC_SESSION, PlayersOrm
+from bot.database.models import PlayersOrm
+from config import ASYNC_ENGINE, ASYNC_SESSION
 
 
 class VlPlayersOrm:

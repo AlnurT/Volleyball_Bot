@@ -1,5 +1,20 @@
 version: "3.8"
+
 services:
-  main:
-    build: .
-    container_name: mybot
+  db:
+    image: postgres:16
+    container_name: db_app
+    command: -p 5438
+    expose:
+      - 5438
+    env_file:
+      - .env
+
+  bot:
+    build:
+      context: .
+    env_file:
+      - .env
+    container_name: bot_app
+    depends_on:
+      - db

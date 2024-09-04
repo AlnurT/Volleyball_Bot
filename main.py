@@ -15,10 +15,11 @@ async def main() -> None:
     Ядро бота для регистрации хэндлеров, расписания и логирования операций
     """
     logging.basicConfig(
-        filename="bot.log",
+        filename="logs/bot.log",
         level=logging.INFO,
         format="%(asctime)s - [%(levelname)s] - %(name)s - "
                "(%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
+        # stream=sys.stdout,
     )
     await set_main_menu(BOT)
 
