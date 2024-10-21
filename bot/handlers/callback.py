@@ -1,7 +1,7 @@
 from aiogram import F
 from aiogram.types import CallbackQuery
 
-from config import DP
+from settings import DP
 from bot.database.orm import VlPlayersOrm
 from bot.utils.make_poll import get_poll
 from bot.utils.poll_text import TextPoll

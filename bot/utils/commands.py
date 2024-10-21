@@ -1,7 +1,7 @@
 from aiogram import Bot
 from aiogram.types import BotCommand, BotCommandScopeChatMember
 
-from config import SETTINGS
+from settings import CHAT_ID, ADMIN_ID
 
 
 async def set_main_menu(bot: Bot):
@@ -13,7 +13,5 @@ async def set_main_menu(bot: Bot):
 
     await bot.set_my_commands(
         commands,
-        BotCommandScopeChatMember(
-            chat_id=SETTINGS.BOT_CHAT_ID, user_id=SETTINGS.BOT_ADMIN_ID
-        )
+        BotCommandScopeChatMember(chat_id=CHAT_ID, user_id=ADMIN_ID)
     )

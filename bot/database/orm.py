@@ -3,7 +3,7 @@ from typing import Sequence
 from sqlalchemy import select, exists
 
 from bot.database.models import PlayersOrm
-from config import ASYNC_ENGINE, ASYNC_SESSION
+from settings import ASYNC_ENGINE, ASYNC_SESSION
 
 
 class VlPlayersOrm:

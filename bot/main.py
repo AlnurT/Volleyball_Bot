@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import sys
 
 from aiogram.methods import DeleteWebhook
@@ -7,7 +8,7 @@ from aiogram.methods import DeleteWebhook
 from bot.handlers import message, callback
 from bot.utils import make_poll
 from bot.utils.commands import set_main_menu
-from config import SCHEDULER, BOT, DP
+from settings import SCHEDULER, BOT, DP
 
 
 async def main() -> None:
@@ -15,11 +16,11 @@ async def main() -> None:
     Ядро бота для регистрации хэндлеров, расписания и логирования операций
     """
     logging.basicConfig(
-        filename="logs/bot.log",
+        # filename=os.path.abspath("../logs/bot.log"),
         level=logging.INFO,
         format="%(asctime)s - [%(levelname)s] - %(name)s - "
                "(%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
-        # stream=sys.stdout,
+        stream=sys.stdout,
     )
     await set_main_menu(BOT)
 

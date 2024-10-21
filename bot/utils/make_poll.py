@@ -6,7 +6,7 @@ from aiogram.types import FSInputFile, Message
 from bot.database.orm import VlPlayersOrm
 from bot.keyboards.inline import get_poll_keyboard, get_end_keyboard
 from bot.utils.poll_text import TextPoll
-from config import BOT, SETTINGS, SCHEDULER
+from settings import BOT, SCHEDULER, CHAT_ID
 
 
 async def get_poll() -> None:
@@ -16,8 +16,8 @@ async def get_poll() -> None:
     text_for_poll = TextPoll.send_poll(players)
 
     message = await BOT.send_photo(
-        chat_id=SETTINGS.BOT_CHAT_ID,
-        photo=FSInputFile(os.path.abspath("bot/images/volleyball.jpg")),
+        chat_id=CHAT_ID,
+        photo=FSInputFile(os.path.abspath("images/volleyball.jpg")),
         caption=text_for_poll,
         parse_mode=ParseMode.HTML,
         reply_markup=get_poll_keyboard(),
