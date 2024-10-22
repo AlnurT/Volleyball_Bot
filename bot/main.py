@@ -6,7 +6,7 @@ import sys
 from aiogram.methods import DeleteWebhook
 
 from bot.handlers import message, callback
-from bot.utils import make_poll
+from bot.utils import poll_action
 from bot.utils.commands import set_main_menu
 from settings import SCHEDULER, BOT, DP
 
@@ -29,7 +29,7 @@ async def main() -> None:
     message.register_message()
 
     SCHEDULER.add_job(
-        make_poll.start_poll,
+        poll_action.start_poll,
         trigger="cron",
         day_of_week="sun",
         hour=18,

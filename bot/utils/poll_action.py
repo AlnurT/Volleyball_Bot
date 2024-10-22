@@ -17,7 +17,7 @@ async def get_poll() -> None:
 
     message = await BOT.send_photo(
         chat_id=CHAT_ID,
-        photo=FSInputFile(os.path.abspath("images/volleyball.jpg")),
+        photo=FSInputFile(os.path.abspath("images/start.jpg")),
         caption=text_for_poll,
         parse_mode=ParseMode.HTML,
         reply_markup=get_poll_keyboard(),
@@ -41,7 +41,9 @@ async def end_poll(message: Message) -> None:
     text_for_poll = TextPoll.send_poll(players, True)
 
     await message.edit_caption(
-        caption=text_for_poll, reply_markup=get_end_keyboard(),
+        photo=FSInputFile(os.path.abspath("images/end.jpg")),
+        caption=text_for_poll,
+        reply_markup=get_end_keyboard(),
     )
 
 

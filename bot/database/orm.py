@@ -1,6 +1,6 @@
 from typing import Sequence
 
-from sqlalchemy import select, exists
+from sqlalchemy import select, exists, desc
 
 from bot.database.models import PlayersOrm
 from settings import ASYNC_ENGINE, ASYNC_SESSION
@@ -67,7 +67,8 @@ class VlPlayersOrm:
         async with ASYNC_SESSION() as session:
             player = await session.scalar(
                 select(PlayersOrm).
-                filter_by(user_id=user_id, status=status)
+                filter_by(user_id=user_id, status=status).
+                order_by(desc(PlayersOrm.num))
             )
 
             if not player:
