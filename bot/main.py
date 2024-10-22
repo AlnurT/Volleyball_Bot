@@ -1,13 +1,13 @@
 import asyncio
 import logging
 import os
-import sys
 
 from aiogram.methods import DeleteWebhook
 
 from bot.handlers import message, callback
-from bot.utils import poll_action
 from bot.utils.commands import set_main_menu
+from bot.utils.log_action import clear_log
+from bot.utils.poll_action import start_poll
 from settings import SCHEDULER, BOT, DP
 
 
@@ -16,11 +16,10 @@ async def main() -> None:
     Ядро бота для регистрации хэндлеров, расписания и логирования операций
     """
     logging.basicConfig(
-        # filename=os.path.abspath("../logs/bot.log"),
+        filename=os.path.abspath("logs/bot.log"),
         level=logging.INFO,
         format="%(asctime)s - [%(levelname)s] - %(name)s - "
                "(%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
-        stream=sys.stdout,
     )
     await set_main_menu(BOT)
 
@@ -29,10 +28,16 @@ async def main() -> None:
     message.register_message()
 
     SCHEDULER.add_job(
-        poll_action.start_poll,
+        start_poll,
         trigger="cron",
         day_of_week="sun",
         hour=18,
+    )
+    SCHEDULER.add_job(
+        clear_log,
+        trigger="cron",
+        day_of_week="sun",
+        hour=17,
     )
 
     try:
