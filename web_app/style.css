@@ -50,7 +50,16 @@ hr {
 	display: grid;
 	gap: 10px;
 	grid-template-columns: 1fr 1fr;
-	grid-auto-rows: 35px min-content;
+	grid-auto-rows: min-content 25px min-content;
+}
+
+#address {
+	margin-top: 10px;
+	grid-column: span 2;
+}
+
+.phone_number {
+	margin-top: 10px;
 }
 
 .payment {
