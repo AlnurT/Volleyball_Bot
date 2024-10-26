@@ -2,19 +2,19 @@ version: "3.8"
 
 services:
   db:
-    image: postgres:17
+    image: postgres:16
     container_name: postgres_app
     command: -p 5438
     expose:
       - 5438
     env_file:
-      - .env
+      - .env.docker
 
   app:
     build:
       context: .
     env_file:
-      - .env
+      - .env.docker
     container_name: bot_app
     depends_on:
-      - postgres
+      - db
