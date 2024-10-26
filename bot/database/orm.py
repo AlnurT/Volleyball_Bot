@@ -12,21 +12,20 @@ class VlPlayersOrm:
     @staticmethod
     async def create_table() -> None:
         """Удаление и создание таблицы"""
+
         async with ASYNC_ENGINE.begin() as conn:
             await conn.run_sync(PlayersOrm.metadata.drop_all)
             await conn.run_sync(PlayersOrm.metadata.create_all)
 
     @staticmethod
     async def get_players() -> Sequence:
-        """
-        Получение списка игроков со ссылкой на аккаунт в телеграмме
+        """Получение списка игроков со ссылкой на аккаунт в телеграмме"""
 
-        :return: Список игроков
-        """
         async with ASYNC_SESSION() as session:
             query = select(PlayersOrm)
             players = await session.scalars(query)
-            return players.all()
+
+        return players.all()
 
     @staticmethod
     async def add_player(user_id: str, name: str, status: str) -> bool:
@@ -53,7 +52,8 @@ class VlPlayersOrm:
                 PlayersOrm(user_id=user_id, name=name, status=status)
             )
             await session.commit()
-            return True
+
+        return True
 
     @staticmethod
     async def remove_player(user_id: str, status: str) -> bool:
@@ -76,4 +76,5 @@ class VlPlayersOrm:
 
             await session.delete(player)
             await session.commit()
-            return True
+
+        return True

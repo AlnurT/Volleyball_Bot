@@ -10,6 +10,8 @@ env = Env()
 env.read_env()
 
 BOT_TOKEN = env.str("BOT_TOKEN")
+MY_BOT = env.str("MY_BOT")
+WEB_URL = f"https://t.me/{MY_BOT}?startapp"
 
 ADMIN_ID = env.int("ADMIN_ID")
 CHAT_ID = env.int("CHAT_ID")

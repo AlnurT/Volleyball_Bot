@@ -47,8 +47,10 @@ async def end_poll(message: Message) -> None:
     )
 
 
-async def start_poll() -> None:
+async def start_poll(data: str = "new") -> None:
     """Запустить голосование"""
 
-    await VlPlayersOrm.create_table()
+    if data == "new":
+        await VlPlayersOrm.create_table()
+
     await get_poll()

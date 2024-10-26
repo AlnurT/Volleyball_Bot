@@ -74,6 +74,7 @@ class TextPoll:
     @classmethod
     def send_poll(cls, pl: Sequence, is_end: bool = False) -> str:
         """Вывод текста в зависимости от условий"""
+
         if not pl:
             return cls._pure_poll()
 

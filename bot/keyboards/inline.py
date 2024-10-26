@@ -1,6 +1,8 @@
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from settings import WEB_URL
+
 
 def get_poll_keyboard() -> InlineKeyboardMarkup:
     """Клавиатура опроса игроков"""
@@ -11,10 +13,8 @@ def get_poll_keyboard() -> InlineKeyboardMarkup:
     keyboard_builder.button(text="Не смогу 👎", callback_data="not_play")
     keyboard_builder.button(text="+1 игрок 🤝", callback_data="plus")
     keyboard_builder.button(text="-1 игрок 🚷", callback_data="minus")
-    keyboard_builder.button(
-        text="Подробнее ⚡️",
-        url="https://t.me/alnurs_test_bot?startapp",
-    )
+    keyboard_builder.button(text="Подробнее ⚡️", url=WEB_URL)
+
     keyboard_builder.adjust(2, 2, 1)
 
     return keyboard_builder.as_markup()
@@ -24,11 +24,7 @@ def get_end_keyboard() -> InlineKeyboardMarkup:
     """Клавиатура конца опроса"""
 
     keyboard_builder = InlineKeyboardBuilder()
-
-    keyboard_builder.button(
-        text="Подробнее ⚡️",
-        url="https://t.me/alnurs_test_bot?startapp",
-    )
+    keyboard_builder.button(text="Подробнее ⚡️", url=WEB_URL)
 
     return keyboard_builder.as_markup()
 

@@ -5,9 +5,10 @@ from settings import CHAT_ID, ADMIN_ID
 
 
 async def set_main_menu(bot: Bot):
-    """ Список с командами и их описанием для кнопки menu """
+    """Список с командами и их описанием для кнопки menu"""
 
     commands = [
+        BotCommand(command="start", description="Запуск опроса по расписанию"),
         BotCommand(command="action", description="Выбор действия"),
     ]
 
