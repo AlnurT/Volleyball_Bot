@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 
 env = Env()
-env.read_env()
+env.read_env(".env")
 
 BOT_TOKEN = env.str("BOT_TOKEN")
 MY_BOT = env.str("MY_BOT")

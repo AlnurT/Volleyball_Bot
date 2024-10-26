@@ -1,9 +1,9 @@
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from bot.keyboards.inline import get_action_keyboard
-from bot.utils.log_action import clear_log
-from bot.utils.poll_action import start_poll
+from src.keyboards.inline import get_action_keyboard
+from src.utils.log_action import clear_log
+from src.utils.poll_action import start_poll
 from settings import BOT, DP, ADMIN_ID, SCHEDULER
 
 

@@ -4,8 +4,8 @@ import os
 
 from aiogram.methods import DeleteWebhook
 
-from bot.handlers import message, callback
-from bot.utils.commands import set_main_menu
+from src.handlers import message, callback
+from src.utils.commands import set_main_menu
 from settings import SCHEDULER, BOT, DP
 
 

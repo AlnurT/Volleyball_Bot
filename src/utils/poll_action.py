@@ -3,9 +3,9 @@ import os
 from aiogram.enums import ParseMode
 from aiogram.types import FSInputFile, Message
 
-from bot.database.orm import VlPlayersOrm
-from bot.keyboards.inline import get_poll_keyboard, get_end_keyboard
-from bot.utils.poll_text import TextPoll
+from src.database.orm import VlPlayersOrm
+from src.keyboards.inline import get_poll_keyboard, get_end_keyboard
+from src.utils.poll_text import TextPoll
 from settings import BOT, SCHEDULER, CHAT_ID
 
 
@@ -17,7 +17,7 @@ async def get_poll() -> None:
 
     message = await BOT.send_photo(
         chat_id=CHAT_ID,
-        photo=FSInputFile(os.path.abspath("images/start.jpg")),
+        photo=FSInputFile(os.path.abspath("src/images/start.jpg")),
         caption=text_for_poll,
         parse_mode=ParseMode.HTML,
         reply_markup=get_poll_keyboard(),
@@ -41,7 +41,7 @@ async def end_poll(message: Message) -> None:
     text_for_poll = TextPoll.send_poll(players, True)
 
     await message.edit_caption(
-        photo=FSInputFile(os.path.abspath("images/end.jpg")),
+        photo=FSInputFile(os.path.abspath("src/images/end.jpg")),
         caption=text_for_poll,
         reply_markup=get_end_keyboard(),
     )

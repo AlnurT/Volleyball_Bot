@@ -2,7 +2,7 @@ from typing import Sequence
 
 from sqlalchemy import select, exists, desc
 
-from bot.database.models import PlayersOrm
+from src.database.models import PlayersOrm
 from settings import ASYNC_ENGINE, ASYNC_SESSION
 
 
