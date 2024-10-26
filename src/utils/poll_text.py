@@ -30,7 +30,7 @@ class TextPoll:
         """Вывод текста с участниками"""
 
         players_text = cls._get_players_gen(pl)
-        info = f"\n😊   Будет игра {(len(pl) + 1) // 2} на {len(pl) // 2}" \
+        info = f"\n😊   Игра {(len(pl) + 1) // 2} на {len(pl) // 2}" \
             if len(pl) >= 8 else "\n😓   Недостаточно игроков"
 
         return as_list(
@@ -53,7 +53,7 @@ class TextPoll:
             as_list(*players_gen),
             "\n⏳ Резерв:",
             as_list(*reserve_gen),
-            f"\n😊   Будет игра 7 на 7",
+            f"\n😊   Игра 7 на 7",
         ).render()[0]
 
     @classmethod
@@ -74,6 +74,7 @@ class TextPoll:
     @classmethod
     def send_poll(cls, pl: Sequence, is_end: bool = False) -> str:
         """Вывод текста в зависимости от условий"""
+
         if not pl:
             return cls._pure_poll()
 

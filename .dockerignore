@@ -1,0 +1,7 @@
+.idea
+.git
+web_app/
+bot_venv/
+
+.gitignore
+*.log
