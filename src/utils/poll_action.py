@@ -1,7 +1,8 @@
 import os
+from datetime import datetime, timedelta
 
 from aiogram.enums import ParseMode
-from aiogram.types import FSInputFile, Message
+from aiogram.types import FSInputFile, Message, InputMediaPhoto
 
 from src.database.orm import VlPlayersOrm
 from src.keyboards.inline import get_poll_keyboard, get_end_keyboard
@@ -24,9 +25,8 @@ async def get_poll() -> None:
     )
     SCHEDULER.add_job(
         end_poll,
-        trigger="cron",
-        day_of_week="tue",
-        hour=23,
+        trigger="date",
+        run_date=datetime.now() + timedelta(days=2, hours=5),
         kwargs={"message": message},
     )
 
@@ -40,9 +40,11 @@ async def end_poll(message: Message) -> None:
     players = await VlPlayersOrm.get_players()
     text_for_poll = TextPoll.send_poll(players, True)
 
-    await message.edit_caption(
-        photo=FSInputFile(os.path.abspath("src/images/end.jpg")),
-        caption=text_for_poll,
+    await message.edit_media(
+        InputMediaPhoto(
+            media=FSInputFile(os.path.abspath("src/images/end.jpg")),
+            caption=text_for_poll,
+        ),
         reply_markup=get_end_keyboard(),
     )
 
