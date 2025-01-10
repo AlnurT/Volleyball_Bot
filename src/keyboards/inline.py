@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -36,6 +38,19 @@ def get_action_keyboard() -> InlineKeyboardMarkup:
 
     keyboard_builder.button(text="Новый опрос", callback_data="new")
     keyboard_builder.button(text="Старый опрос", callback_data="old")
+    keyboard_builder.adjust(2)
+
+    return keyboard_builder.as_markup()
+
+
+def get_payment_keyboard(players: Sequence) -> InlineKeyboardMarkup:
+    """Клавиатура оплаты для админа"""
+
+    keyboard_builder = InlineKeyboardBuilder()
+
+    for pl in players:
+        keyboard_builder.button(text=f"{pl.name}", callback_data=f"{pl.num}")
+
     keyboard_builder.adjust(2)
 
     return keyboard_builder.as_markup()

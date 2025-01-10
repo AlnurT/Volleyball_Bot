@@ -3,5 +3,8 @@
 web_app/
 bot_venv/
 
-.gitignore
 *.log
+.dockerignore
+.gitignore
+docker-compose.yml
+Dockerfile

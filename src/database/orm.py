@@ -18,11 +18,19 @@ class VlPlayersOrm:
             await conn.run_sync(PlayersOrm.metadata.create_all)
 
     @staticmethod
-    async def get_players() -> Sequence:
-        """Получение списка игроков со ссылкой на аккаунт в телеграмме"""
+    async def get_players(is_pay: bool = False) -> Sequence:
+        """
+        Получение списка игроков со ссылкой на аккаунт в телеграмме
 
+        :param is_pay: Проверка на список с оплатой
+        """
         async with ASYNC_SESSION() as session:
-            query = select(PlayersOrm)
+            if is_pay:
+                query = select(PlayersOrm).filter_by(payment=False).\
+                    order_by(PlayersOrm.num)
+            else:
+                query = select(PlayersOrm).order_by(PlayersOrm.num)
+
             players = await session.scalars(query)
 
         return players.all()
@@ -78,3 +86,16 @@ class VlPlayersOrm:
             await session.commit()
 
         return True
+
+    @staticmethod
+    async def change_payment_status_(num: int) -> None:
+        """
+        Изменение статуса оплаты игрока
+
+        :param num: Номер игрока в базе данных
+        """
+        async with ASYNC_SESSION() as session:
+            player = await session.get(PlayersOrm, num)
+            player.payment = not player.payment
+
+            await session.commit()
