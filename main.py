@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import sys
 
 from aiogram.methods import DeleteWebhook
 
@@ -17,6 +18,7 @@ async def main() -> None:
         level=logging.INFO,
         format="%(asctime)s - [%(levelname)s] - %(name)s - "
                "(%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
+        # stream=sys.stdout,
     )
     await set_main_menu(BOT)
 

@@ -6,15 +6,17 @@ from aiogram.utils.formatting import as_list
 
 class TextPoll:
     @staticmethod
-    def _get_players_gen(players: Sequence) -> Generator:
+    def _get_players_gen(players: Sequence, pay: bool = False) -> Generator:
         """Вывод списка игроков со ссылками на их аккаунт"""
 
         for index, pl in enumerate(players, 1):
             text = f"<a href='tg://user?id={pl.user_id}'>{pl.name}</a>"
+            pay_icon = "💵 " if pay and not pl.payment else ""
+
             if pl.status == "player":
-                yield f"<code>  {index:>2}. </code> {text}"
+                yield f"<code>  {index:>2}. {pay_icon}</code> {text}"
             else:
-                yield f"<code>  {index:>2}. </code> Игрок от {text}"
+                yield f"<code>  {index:>2}. {pay_icon}</code> Игрок от {text}"
 
     @staticmethod
     def _pure_poll() -> str:
@@ -60,7 +62,7 @@ class TextPoll:
     def _end_poll(cls, pl: Sequence) -> str:
         """Вывод текста конца голосования"""
 
-        players_gen = cls._get_players_gen(pl)
+        players_gen = cls._get_players_gen(pl, pay=True)
         day = datetime.now().strftime("%d.%m")
 
         return as_list(

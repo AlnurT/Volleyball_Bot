@@ -28,3 +28,4 @@ class PlayersOrm(Base):
     user_id: Mapped[str_50]
     name: Mapped[str_128]
     status: Mapped[str_50]
+    payment: Mapped[bool] = mapped_column(default=False)
